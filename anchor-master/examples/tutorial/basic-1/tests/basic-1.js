@@ -84,7 +84,7 @@ describe("basic-1", () => {
     const account = await program.account.myAccount.fetch(myAccount.publicKey);
 
     // Check it's state was mutated.
-    assert.equal(account.data, 101);
+    assert.equal(account.data, 101 );
 
     // #endregion update-test
   });
