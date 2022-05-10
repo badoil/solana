@@ -3,7 +3,7 @@ cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [programs.localnet]
-basic_1 = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+basic_1 = "CyUAPrd5NrKUXBe8SeCNinCbSdwdvW3E8Lgq6nh6MTeF"
 
 [scripts]
 test = "yarn run mocha -t 1000000 tests/"
