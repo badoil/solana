@@ -2,11 +2,39 @@ use anchor_lang::prelude::*;
 
 declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 
+const TEXT_LENGTH: usize = 1024;
+const USER_NAME_LENGTH: usize = 100;
+const USER_URL_LENGTH: usize = 255;
+
 #[program]
-pub mod programs {
+pub mod fb {
     use super::*;
 
-    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
+    pub fn create_state(ctx: Context<CreateState>) -> Result<()> {
+        let state = &mut ctx.accounts.state;
+        state.authority = ctx.accounts.authority.key();
+        state.post_count = 0;
+        Ok(())
+    }
+
+    pub fn create_post(
+        ctx: Context<CreatePost>,
+        text: String,
+        poster_name: String,
+        poster_url: String,
+    ) -> Result<()> {
+        let state = &mut ctx.accounts.state;
+        let post = &mut ctx.accounts.post;
+        post.authority = ctx.accounts.authority.key();
+        post.text = text;
+        post.poster_name = poster_name;
+        post.poster_url = poster_url;
+        post.comment_count = 0;
+        post.index = state.post_count;
+        post.post_time = ctx.accounts.clock.unix_timestamp;
+
+        state.post_count += 1;
+
         Ok(())
     }
 }
@@ -46,13 +74,26 @@ pub struct CreatePost<'info> {
     // authenticate post account
     #[account(
         init,
-        seeds = [b"post".as_ref(), post_count.to_be_bytes().as_ref()],
+        // post account use "post" and index of post as seed
+        seeds = [b"post".as_ref(), state.post_count.to_be_bytes().as_ref()],
         bump,
         payer = authority,
-        space = size_of::<PostAccount>() + 8
+        space = size_of::<PostAccount>() + USER_NAME_LENGTH + USER_URL_LENGTH + TEXT_LENGTH
     )]
+    pub post: Account<'info, PostAccount>,
     
+    //Authority, this is signer who paid transaction fee
+    #[account(mut)]
+    pub authority: Signer<'info>,
 
+    //system program
+    pub system_program: UncheckedAccount<'info>,
+
+    //token program
+    #[account(constraint = token_program.key == &token::ID)]
+    pub token_program: Program<'info, Token>,
+
+    pub clock: Sysvar<'info, Clock>,
 }
 
 #[account]
