@@ -64,4 +64,52 @@ describe("basic-1", () => {
 
     // #endregion update-test
   });
+
+  it("Increment", async () => {
+    const myAccount = _myAccount;
+
+    // #region update-test
+
+    // The program to execute.
+    const program = anchor.workspace.Basic1;
+
+    // Invoke the update rpc.
+    await program.rpc.increment({
+      accounts: {
+        myAccount: myAccount.publicKey,
+      },
+    });
+
+    // Fetch the newly updated account.
+    const account = await program.account.myAccount.fetch(myAccount.publicKey);
+
+    // Check it's state was mutated.
+    assert.equal(account.data, 101);
+
+    // #endregion update-test
+  });
+
+  it("Decrement", async () => {
+    const myAccount = _myAccount;
+
+    // #region update-test
+
+    // The program to execute.
+    const program = anchor.workspace.Basic1;
+
+    // Invoke the update rpc.
+    await program.rpc.decrement({
+      accounts: {
+        myAccount: myAccount.publicKey,
+      },
+    });
+
+    // Fetch the newly updated account.
+    const account = await program.account.myAccount.fetch(myAccount.publicKey);
+
+    // Check it's state was mutated.
+    assert.equal(account.data, 100);
+
+    // #endregion update-test
+  }); 
 });
