@@ -104,12 +104,90 @@ const Content: FC = () => {
         }
     }
 
+    async function increment() {
+        const provider = getProvider();
+        if (!provider) {
+            throw("provideris null");
+        }
+
+        //create the program interface combining the idl, program id, and provider
+        //bug with default importing when handling string value types, fix by re-converting to json
+        const a = JSON.stringify(idl);
+        const b = JSON.parse(a);
+        const program = new Program(b, idl.metadata.address, provider);
+        try {
+            //interact with the program via rpc
+            await program.rpc.increment({
+                accounts: {
+                    myAccount: baseAccount.publicKey,
+                },
+            })
+
+            const account = await program.account.myAccount.fetch(baseAccount.publicKey);
+            console.log("account.data: ", account.data.toString()); 
+        } catch(err) { 
+            console.error(err);
+        }
+    }
+
+    async function decrement() {
+        const provider = getProvider();
+        if (!provider) {
+            throw("provideris null");
+        }
+
+        //create the program interface combining the idl, program id, and provider
+        //bug with default importing when handling string value types, fix by re-converting to json
+        const a = JSON.stringify(idl);
+        const b = JSON.parse(a);
+        const program = new Program(b, idl.metadata.address, provider);
+        try {
+            //interact with the program via rpc
+            await program.rpc.decrement({
+                accounts: {
+                    myAccount: baseAccount.publicKey,
+                },
+            })
+
+            const account = await program.account.myAccount.fetch(baseAccount.publicKey);
+            console.log("account.data: ", account.data.toString()); 
+        } catch(err) { 
+            console.error(err); 
+        }
+    }
+
+    async function update() {
+        const provider = getProvider();
+        if (!provider) {
+            throw("provideris null");
+        }
+
+        //create the program interface combining the idl, program id, and provider
+        //bug with default importing when handling string value types, fix by re-converting to json
+        const a = JSON.stringify(idl);
+        const b = JSON.parse(a);
+        const program = new Program(b, idl.metadata.address, provider);
+        try {
+            //interact with the program via rpc
+            await program.rpc.update(new BN(100), {
+                accounts: {
+                    myAccount: baseAccount.publicKey,
+                },
+            })
+
+            const account = await program.account.myAccount.fetch(baseAccount.publicKey);
+            console.log("account.data: ", account.data.toString()); 
+        } catch(err) { 
+            console.error(err); 
+        }
+    }
+
     return (
         <div className="App">
             <button onClick={createCounter}>Initialize</button>
-            <button>Increment</button>
-            <button>Decrement</button>
-            <button>Update</button>
+            <button onClick={increment}>Increment</button>
+            <button onClick={decrement}>Decrement</button>
+            <button onClick={update}>Update</button>
             <WalletMultiButton />
         </div>
     );
