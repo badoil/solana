@@ -19,12 +19,21 @@ fn main() {
         
         stream.read(&mut buffer).unwrap();
 
-        let contents = fs::read_to_string("hello.html").unwrap();
+        let get = b"GET / HTTP/1.1\r\n";
 
-        // println!("Request: {}", String::from_utf8_lossy(&buffer[..]));
+        let (status_line, filename) = if buffer.starts_with(get) {
+            ("HTTP/1.1 200 OK\r\n\r\n", "hello.html")
+        } else {
+            ("HTTP/1.1 404 NOT FOUND\r\n\r\n", "error.html")
+        };
+        println!("status_line: {}, filename: {}", status_line, filename);
+
+        let contents = fs::read_to_string(filename).unwrap();
+
+        // println!("Request:  String::from_utf8_lossy(&buffer[..]));
         let response = format!(
-            "HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}",
-            contents.len(),
+            "{}{}",
+            status_line,
             contents,
         );
 
